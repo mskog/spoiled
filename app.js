@@ -1,13 +1,12 @@
 const express = require('express')
 const app = express()
 const puppeteer = require('puppeteer')
-const snakeCase = require('lodash.snakecase')
 const axios = require('axios')
 require('dotenv').config()
 
 app.get('/', function (req, res) {
   (async() => {
-    const title = snakeCase(req.query.title)
+    const title = req.query.title
     const year = req.query.year || ''
 
     const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})

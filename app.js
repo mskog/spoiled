@@ -25,9 +25,7 @@ app.get('/', function (req, res) {
 })
 
 async function findMovieUrl (title, year) {
-  const googleKey = process.env.GOOGLE_KEY
-  const googleCx = process.env.GOOGLE_CX
-  const response = await axios.get(`https://www.googleapis.com/customsearch/v1?key=${googleKey}&cx=${googleCx}&q=${title} ${year}`)
+  const response = await axios.get(`https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_KEY}&cx=${process.env.GOOGLE_CX}&q=${title} ${year}`)
   return response.data['items'][0]['link']
 }
 

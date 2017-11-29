@@ -6,13 +6,21 @@ require('dotenv').config()
 
 app.get('/', function (req, res) {
   (async() => {
+    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
+
+    process.on('unhandledRejection', (reason, p) => {
+      console.error('Unhandled Rejection at: Promise', p, 'reason:', reason)
+      browser.close()
+      res.status(500)
+      res.json({error: 500})
+    })
+
     const title = req.query.title
     const year = req.query.year || ''
 
-    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
     const page = await browser.newPage()
 
-    // page.on('console', (...args) => console.log('PAGE LOG:', ...args))
+      // page.on('console', (...args) => console.log('PAGE LOG:', ...args))
 
     const movieUrl = await findMovieUrl(title, year)
     await page.goto(movieUrl, {waitUntil: 'domcontentloaded'})

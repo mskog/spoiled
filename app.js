@@ -9,10 +9,8 @@ app.get('/', function (req, res) {
     const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
 
     process.on('unhandledRejection', (reason, p) => {
-      console.error('Unhandled Rejection at: Promise', p, 'reason:', reason)
       browser.close()
-      res.status(500)
-      res.json({error: 500})
+      res.status('500').end()
     })
 
     const title = req.query.title

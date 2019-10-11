@@ -26,10 +26,7 @@ app.get("/", function(req, res) {
     const movieUrl = await findMovieUrl(title, year);
     await page.goto(movieUrl, { waitUntil: "domcontentloaded" });
 
-    let result = Object.assign(
-      { title: title, year: year, url: movieUrl },
-      await extractRtData(page)
-    );
+    let result = Object.assign({ title: title, year: year, url: movieUrl }, await extractRtData(page));
 
     res.json(result);
     browser.close();
@@ -38,19 +35,22 @@ app.get("/", function(req, res) {
 
 async function findMovieUrl(title, year) {
   const response = await axios.get(
-    `https://www.googleapis.com/customsearch/v1?key=${
-      process.env.GOOGLE_KEY
-    }&cx=${process.env.GOOGLE_CX}&q=${title} ${year}`
+    `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_KEY}&cx=${process.env.GOOGLE_CX}&q=${title} ${year}`
   );
   return response.data["items"][0]["link"];
 }
 
 async function extractRtData(page) {
   return page.evaluate(() => {
+    const [tomatometer, audience_score] = Array.from(document.querySelectorAll(".mop-ratings-wrap__percentage")).map(
+      node => {
+        return node.textContent.match(/\d+/)[0];
+      }
+    );
+
     return {
-      score: document
-        .querySelector(".mop-ratings-wrap__percentage")
-        .textContent.match(/\d+/)[0]
+      tomatometer: tomatometer,
+      audience_score: audience_score
     };
   });
 }
